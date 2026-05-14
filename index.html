@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="description" content="찬·반 누적 발언 시간을 풀스크린으로 표시하는 토론 수업용 타이머. 초등 4~6학년 교실 TV용." />
+  <title>토론 발언 타이머 · 찬·반 누적시계</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='%235e6ad2'/%3E%3Ctext x='12' y='16' text-anchor='middle' font-size='12' fill='white' font-family='sans-serif' font-weight='700'%3E:%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#pro-panel">메인으로 건너뛰기</a>
+
+  <header class="app-header" role="banner">
+    <div class="topic-wrap">
+      <label class="topic-label" for="topic-input">토론 주제</label>
+      <input
+        id="topic-input"
+        class="topic-input"
+        type="text"
+        placeholder="예: 학교에서 휴대전화 사용을 허용해야 한다"
+        maxlength="80"
+        autocomplete="off"
+        spellcheck="false"
+      />
+    </div>
+    <div class="header-actions">
+      <button id="btn-mute" class="icon-btn" type="button" aria-label="음소거 켜기" aria-pressed="false" title="음소거 (M)">
+        <svg class="i-speaker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M11 5L6 9H3v6h3l5 4V5z" stroke-linejoin="round" stroke-linecap="round" />
+          <path class="i-on" d="M15.5 8.5a5 5 0 010 7M18.5 6a8 8 0 010 12" stroke-linecap="round" />
+          <path class="i-off" d="M16 9l5 6M21 9l-5 6" stroke-linecap="round" />
+        </svg>
+      </button>
+      <button id="btn-settings" class="icon-btn" type="button" aria-label="설정 열기" title="설정">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09A1.65 1.65 0 0015 4.6a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9c.36.16.66.42.88.76.22.34.34.74.34 1.15a2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" stroke-linejoin="round" stroke-linecap="round" />
+        </svg>
+      </button>
+      <button id="btn-fullscreen" class="icon-btn" type="button" aria-label="풀스크린 토글" title="풀스크린 (F)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke-linejoin="round" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="stage" id="stage">
+    <section
+      id="pro-panel"
+      class="team-panel"
+      data-side="pro"
+      data-state="idle"
+      tabindex="0"
+      role="button"
+      aria-label="찬성팀 활성 + 시작"
+    >
+      <div class="panel-inner">
+        <div class="team-name" id="pro-name">찬성</div>
+        <div class="cumulative" aria-live="off">
+          <span id="pro-cum" class="cum-time">0:00.0</span>
+        </div>
+        <div class="sub-line">
+          <span class="count-label">발언</span>
+          <span id="pro-count" class="count-value">0</span>
+          <span class="count-label">회</span>
+          <span class="now-divider" aria-hidden="true">·</span>
+          <span class="now-label">지금</span>
+          <span id="pro-now" class="now-value">—</span>
+        </div>
+      </div>
+      <div class="warn-overlay" aria-hidden="true"></div>
+    </section>
+
+    <section
+      id="con-panel"
+      class="team-panel"
+      data-side="con"
+      data-state="idle"
+      tabindex="0"
+      role="button"
+      aria-label="반대팀 활성 + 시작"
+    >
+      <div class="panel-inner">
+        <div class="team-name" id="con-name">반대</div>
+        <div class="cumulative">
+          <span id="con-cum" class="cum-time">0:00.0</span>
+        </div>
+        <div class="sub-line">
+          <span class="count-label">발언</span>
+          <span id="con-count" class="count-value">0</span>
+          <span class="count-label">회</span>
+          <span class="now-divider" aria-hidden="true">·</span>
+          <span class="now-label">지금</span>
+          <span id="con-now" class="now-value">—</span>
+        </div>
+      </div>
+      <div class="warn-overlay" aria-hidden="true"></div>
+    </section>
+  </main>
+
+  <div class="balance-bar" aria-label="누적 시간 균형" role="img">
+    <div class="balance-pro" id="balance-pro" style="flex-grow:1"></div>
+    <div class="balance-con" id="balance-con" style="flex-grow:1"></div>
+  </div>
+  <div class="balance-readout" id="balance-readout" aria-live="off">균형 50% / 50%</div>
+
+  <footer class="controls">
+    <button id="btn-toggle" class="btn btn-primary" type="button">
+      <span class="btn-key">Space</span>
+      <span class="btn-label" id="btn-toggle-label">시작</span>
+    </button>
+    <button id="btn-active-pro" class="btn btn-secondary" type="button" aria-label="찬성 팀 활성으로 전환 후 시작">
+      <span class="btn-key">A</span>
+      <span class="btn-label">찬성</span>
+    </button>
+    <button id="btn-active-con" class="btn btn-secondary" type="button" aria-label="반대 팀 활성으로 전환 후 시작">
+      <span class="btn-key">L</span>
+      <span class="btn-label">반대</span>
+    </button>
+    <button id="btn-reset" class="btn btn-danger" type="button" aria-label="리셋 확인 모달 열기">
+      <span class="btn-key">R</span>
+      <span class="btn-label">리셋</span>
+    </button>
+    <div class="key-hints" aria-hidden="true">
+      <span><kbd>Space</kbd> 토글</span>
+      <span><kbd>A</kbd>/<kbd>L</kbd> 팀 전환</span>
+      <span><kbd>F</kbd> 풀스크린</span>
+      <span><kbd>M</kbd> 음소거</span>
+      <span><kbd>R</kbd> 리셋</span>
+    </div>
+  </footer>
+
+  <!-- Settings modal -->
+  <div
+    class="modal-backdrop"
+    id="settings-modal"
+    hidden
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="settings-title"
+  >
+    <div class="modal">
+      <h2 id="settings-title" class="modal-title">설정</h2>
+      <div class="form-row">
+        <label class="form-label" for="pro-name-input">찬성팀 이름</label>
+        <input id="pro-name-input" class="form-input" type="text" maxlength="20" autocomplete="off" />
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="con-name-input">반대팀 이름</label>
+        <input id="con-name-input" class="form-input" type="text" maxlength="20" autocomplete="off" />
+      </div>
+      <div class="form-row form-row-inline">
+        <span class="form-label">1인 발언 한도</span>
+        <div class="limit-inputs">
+          <input id="limit-min" class="form-input form-input-num" type="number" inputmode="numeric" min="0" max="30" />
+          <span class="limit-sep">분</span>
+          <input id="limit-sec" class="form-input form-input-num" type="number" inputmode="numeric" min="0" max="59" />
+          <span class="limit-sep">초</span>
+        </div>
+      </div>
+      <div class="form-row form-row-inline">
+        <label class="form-checkbox">
+          <input id="muted-input" type="checkbox" />
+          <span>음소거</span>
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button id="settings-cancel" class="btn btn-secondary" type="button">취소</button>
+        <button id="settings-save" class="btn btn-primary" type="button">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reset confirm modal -->
+  <div
+    class="modal-backdrop"
+    id="reset-modal"
+    hidden
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="reset-title"
+  >
+    <div class="modal modal-sm">
+      <h2 id="reset-title" class="modal-title">리셋할까요?</h2>
+      <p class="modal-body">양 팀의 누적 시간과 발언 횟수가 0으로 초기화됩니다. 되돌릴 수 없습니다.</p>
+      <div class="modal-actions">
+        <button id="reset-cancel" class="btn btn-secondary" type="button">취소</button>
+        <button id="reset-confirm" class="btn btn-danger" type="button">리셋</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
